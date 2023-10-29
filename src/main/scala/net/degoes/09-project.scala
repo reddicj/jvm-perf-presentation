@@ -28,6 +28,10 @@ object dataset1 {
     def apply(field: Field): Value = map(field.name)
   }
 
+  object Dataset {
+    def fromRows(rows: Chunk[Row]): Dataset = Dataset(rows)
+  }
+
   final case class Dataset(rows: Chunk[Row]) { self =>
     def apply(field: Field): Dataset =
       Dataset(
@@ -81,7 +85,7 @@ object dataset1 {
             (leftName, leftValue)   = left
             right                  <- rightRow.map
             (rightName, rightValue) = right
-          } yield s"(leftName ${symbol} rightName)" ->
+          } yield s"$leftName ${symbol} $rightName" ->
             ((leftValue, rightValue) match {
               case (left, right) if f.isDefinedAt((left, right)) => f((left, right))
               case (_, _)                                        => Value.NA
