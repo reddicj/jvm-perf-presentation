@@ -136,6 +136,16 @@ class ProjectBenchmark {
     val netPay: Field = Field("netPay")
   }
 
+  object benchmark3 {
+    import net.degoes.dataset3.*
+
+    var dataset: Dataset = _
+
+    val start: Field  = Field("start")
+    val end: Field    = Field("end")
+    val netPay: Field = Field("netPay")
+  }
+
   @Setup
   def setupSlow(): Unit = {
     import benchmark1._
@@ -180,6 +190,28 @@ class ProjectBenchmark {
     })
   }
 
+  @Setup
+  def setupDataset3(): Unit = {
+    import benchmark3.*
+    import net.degoes.dataset3.*
+
+    val rng: Random = new Random(0L)
+
+    dataset = Dataset.fromRows(Chunk.fill(size) {
+      val start  = rng.between(0, 360)
+      val end    = rng.between(start, 360)
+      val netPay = rng.between(20000, 60000)
+
+      Row(
+        Map(
+          "start"  -> Value.Integer(start),
+          "end"    -> Value.Integer(end),
+          "netPay" -> Value.Integer(netPay)
+        )
+      )
+    })
+  }
+
   @Benchmark
   def baseline(blackhole: Blackhole): Unit = {
     import benchmark1._
@@ -190,6 +222,13 @@ class ProjectBenchmark {
   @Benchmark
   def dataset2(blackhole: Blackhole): Unit = {
     import benchmark2.*
+    val result = (dataset(start) + dataset(end)) / dataset(netPay)
+    blackhole.consume(result)
+  }
+
+  @Benchmark
+  def dataset3(blackhole: Blackhole): Unit = {
+    import benchmark3.*
     val result = (dataset(start) + dataset(end)) / dataset(netPay)
     blackhole.consume(result)
   }

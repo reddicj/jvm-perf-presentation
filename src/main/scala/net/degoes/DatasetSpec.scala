@@ -2,7 +2,7 @@ package net.degoes
 
 import zio.*
 import zio.test.*
-import dataset2.*
+import dataset3.*
 import scala.util.Random
 import zio.test.Assertion.*
 
